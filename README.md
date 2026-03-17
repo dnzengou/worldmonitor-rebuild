@@ -1,292 +1,265 @@
-# WorldMonitor Agents
+# WorldMonitor UI Components
 
-A **Chain-of-Thought Multi-Agent System** for real-time global intelligence monitoring. Built with Rust and React, featuring AI-powered analysis with transparent reasoning.
+A production-ready React component library for the WorldMonitor OSINT platform, featuring a Palantir Apollo/Chainalysis-inspired dark mode aesthetic with high information density and analyst-first design principles.
 
-## 🎯 Key Features
+## Design Philosophy
 
-### Multi-Agent Architecture
-- **5 Specialized Agents** working together:
-  - `DataCollector` - Fuses intelligence from 150+ sources (GDELT, RSS)
-  - `Analyst` - Pattern recognition, anomaly detection, brief generation
-  - `Forecaster` - Trend extrapolation and risk assessment
-  - `Notifier` - Smart alerts with rate limiting
-  - `Validator` - Confidence scoring and source verification
+### "Smooth Friction" UI
+- **Low Latency**: Every interaction responds in <100ms
+- **High Density**: Maximum data per pixel without clutter
+- **Progressive Disclosure**: Summary first, detail on demand
+- **Motion as Information**: Animations indicate state changes
 
-### Chain-of-Thought Reasoning
-Every analysis includes a transparent reasoning chain showing:
-- Which agents were involved
-- What data was considered
-- How conclusions were reached
-- Confidence scores at each step
+### Visual Language
+- **Dark Mode Primary**: `#0A0B0D` background with cyan (`#00D4FF`) accents
+- **Typography**: Inter for UI, JetBrains Mono for data
+- **Information Hierarchy**: Clear separation through color, spacing, and weight
+- **Accessibility**: WCAG AA compliant with keyboard navigation
 
-### User Engagement
-- **3-step onboarding** with interest selection
-- **Streak tracking** for daily engagement
-- **Smart notifications** with rate limiting
-- **Personalized briefs** based on user interests
+## Component Library
 
-### Monetization
-- **Free Tier**: 24h delayed data, 3 alerts
-- **Pro ($9/mo)**: Real-time data, 50 alerts, AI briefs
-- **Enterprise ($299/mo)**: Unlimited, API access, team workspaces
+### UI Components
 
-## 🏗️ Architecture
+#### Button
+```tsx
+import { Button } from '@/components/ui';
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Agent Coordinator                         │
-│  ┌─────────────┐  ┌──────────┐  ┌──────────┐  ┌─────────┐ │
-│  │DataCollector│  │  Analyst │  │Forecaster│  │Notifier │ │
-│  └─────────────┘  └──────────┘  └──────────┘  └─────────┘ │
-│         │                │             │            │       │
-│         └────────────────┴─────────────┴────────────┘       │
-│                          │                                  │
-│                    ┌─────────┐                              │
-│                    │Validator│                              │
-│                    └─────────┘                              │
-└─────────────────────────────────────────────────────────────┘
-                              │
-        ┌─────────────────────┼─────────────────────┐
-        ▼                     ▼                     ▼
-   ┌─────────┐          ┌─────────┐          ┌─────────┐
-   │  SQLite │          │  Cache  │          │   LLM   │
-   │   /D1   │          │ (Edge)  │          │  (Groq) │
-   └─────────┘          └─────────┘          └─────────┘
+<Button variant="primary" size="md" loading={false}>
+  Analyze
+</Button>
 ```
 
-## 🚀 Quick Start
+**Variants**: `primary` | `secondary` | `ghost` | `danger`
+**Sizes**: `sm` | `md` | `lg`
 
-### Prerequisites
-- Rust 1.70+
-- Node.js 18+
-- SQLite (for local development)
+#### Badge
+```tsx
+import { Badge } from '@/components/ui';
 
-### Local Development
+<Badge variant="critical" dot pulse>
+  12 Alerts
+</Badge>
+```
+
+**Variants**: `critical` | `high` | `medium` | `low` | `info` | `cyan` | `green` | `purple`
+
+#### Card
+```tsx
+import { Card, CardHeader, CardContent } from '@/components/ui';
+
+<Card hover padding="md">
+  <CardHeader title="Threat Analysis" subtitle="Last 24 hours" />
+  <CardContent>{/* Content */}</CardContent>
+</Card>
+```
+
+#### Input
+```tsx
+import { Input } from '@/components/ui';
+
+<Input 
+  label="Search" 
+  placeholder="Enter query..."
+  leftIcon={<SearchIcon />}
+  error={errorMessage}
+/>
+```
+
+#### Command Palette
+```tsx
+import { CommandPalette } from '@/components/ui';
+import { useCommandPalette } from '@/hooks';
+
+const commands = [
+  { id: '1', title: 'Filter: Middle East', category: 'Filters', action: () => {} },
+];
+
+const { isOpen, searchQuery, filteredCommands, /* ... */ } = useCommandPalette(commands);
+
+<CommandPalette
+  isOpen={isOpen}
+  onClose={close}
+  searchQuery={searchQuery}
+  onSearchChange={setSearchQuery}
+  commands={filteredCommands}
+  selectedIndex={selectedIndex}
+  onSelect={select}
+  onExecute={execute}
+/>
+```
+
+### Dashboard Components
+
+#### ActivityFeed
+```tsx
+import { ActivityFeed } from '@/components/dashboard';
+
+<ActivityFeed
+  events={events}
+  onEventClick={(event) => console.log(event)}
+  maxHeight="400px"
+/>
+```
+
+#### StatusBar
+```tsx
+import { StatusBar } from '@/components/dashboard';
+
+<StatusBar
+  version="2.6.5"
+  isLive={true}
+  region="Global"
+  lastUpdate={Date.now()}
+  alertCount={3}
+/>
+```
+
+#### AIInsightsPanel
+```tsx
+import { AIInsightsPanel } from '@/components/dashboard';
+
+<AIInsightsPanel
+  insight={{
+    id: '1',
+    title: 'Threat Pattern Detected',
+    conclusion: 'Analysis indicates...',
+    overallConfidence: 94,
+    category: 'threat',
+    generatedAt: Date.now(),
+    sources: ['Source 1', 'Source 2'],
+    steps: [
+      { id: '1', order: 1, description: 'Analyzed events', confidence: 98, status: 'completed' },
+    ],
+  }}
+  onExport={() => {}}
+  onShare={() => {}}
+  onDeepDive={() => {}}
+/>
+```
+
+### Map Components
+
+#### LayerControl
+```tsx
+import { LayerControl } from '@/components/map';
+
+<LayerControl
+  layers={layers}
+  onToggleLayer={(id) => {}}
+  onToggleCategory={(category, enabled) => {}}
+/>
+```
+
+## Hooks
+
+### useCommandPalette
+Manages command palette state, keyboard navigation, and search filtering.
+
+```tsx
+const { isOpen, searchQuery, filteredCommands, open, close, toggle } = useCommandPalette(commands);
+```
+
+### useWebSocket
+Real-time WebSocket connection with auto-reconnect.
+
+```tsx
+const { status, data, send, reconnect } = useWebSocket('wss://api.worldmonitor.io/ws');
+```
+
+### useDebounce
+Debounce values for search inputs.
+
+```tsx
+const debouncedSearch = useDebounce(searchQuery, 300);
+```
+
+## Utility Functions
+
+```tsx
+import { 
+  formatRelativeTime, 
+  formatNumber, 
+  getSeverityColor,
+  cn 
+} from '@/lib';
+
+formatRelativeTime(Date.now() - 60000); // "1m ago"
+formatNumber(1234567); // "1,234,567"
+getSeverityColor('critical'); // CSS classes for critical severity
+```
+
+## Color System
+
+### Backgrounds
+- `--bg-primary`: `#0A0B0D` - Main canvas
+- `--bg-secondary`: `#111214` - Panels, cards
+- `--bg-tertiary`: `#1A1B1F` - Elevated surfaces
+- `--bg-hover`: `#25262C` - Interactive hover
+
+### Accents
+- `--accent-cyan`: `#00D4FF` - Primary actions
+- `--accent-blue`: `#3B82F6` - Secondary actions
+- `--accent-red`: `#EF4444` - Critical alerts
+- `--accent-amber`: `#F59E0B` - Warnings
+- `--accent-green`: `#10B981` - Success
+- `--accent-purple`: `#8B5CF6` - AI content
+
+### Text
+- `--text-primary`: `#FFFFFF` - Headlines
+- `--text-secondary`: `#9CA3AF` - Body text
+- `--text-tertiary`: `#6B7280` - Captions
+- `--text-disabled`: `#4B5563` - Disabled
+
+## Typography
+
+| Size | Value | Usage |
+|------|-------|-------|
+| 2xs | 11px | Labels, timestamps |
+| xs | 12px | Secondary info |
+| sm | 13px | Body text |
+| base | 14px | Emphasized body |
+| lg | 16px | Section headers |
+| xl | 18px | Panel titles |
+| 2xl | 24px | Page titles |
+
+## Installation
 
 ```bash
-# Clone repository
-git clone https://github.com/yourusername/worldmonitor-agents.git
-cd worldmonitor-agents
-
-# Set environment variables
-cp .env.example .env
-# Edit .env with your GROQ_API_KEY
-
-# Build and run backend
-cd backend
-cargo run
-
-# In another terminal, run frontend
-cd frontend
 npm install
 npm run dev
-
-# Access the app
-open http://localhost:3000
 ```
 
-### Docker Deployment
+## Project Structure
 
-```bash
-# Build and run
-docker-compose up -d
-
-# Access the app
-open http://localhost:8080
+```
+worldmonitor-ui-components/
+├── app/              # Next.js app directory
+│   ├── page.tsx      # Main dashboard
+│   └── layout.tsx    # Root layout
+├── components/
+│   ├── ui/           # Base UI components
+│   ├── dashboard/    # Dashboard-specific components
+│   └── map/          # Map-related components
+├── hooks/            # Custom React hooks
+├── lib/              # Utility functions
+├── styles/           # Global styles
+└── public/           # Static assets
 ```
 
-## 📡 API Endpoints
+## Browser Support
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/intelligence` | GET | Latest events (24h) |
-| `/api/brief` | POST | AI-generated brief with reasoning |
-| `/api/geo` | GET | GeoJSON for map |
-| `/api/sync` | GET | Differential updates |
-| `/api/alerts` | POST | Create alert |
-| `/api/user` | GET/POST | User profile |
-| `/api/agents/status` | GET | Agent health & metrics |
-| `/api/pricing` | GET | Subscription tiers |
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
 
-### Example: Generate Brief with Reasoning
+## Performance Targets
 
-```bash
-curl -X POST http://localhost:8080/api/brief \
-  -H "Content-Type: application/json" \
-  -d '{
-    "country": "Ukraine",
-    "include_reasoning": true
-  }'
-```
+- First Contentful Paint: <1.5s
+- Time to Interactive: <3.5s
+- Animation frame rate: 60fps
+- Input latency: <100ms
 
-Response:
-```json
-{
-  "country": "Ukraine",
-  "summary": "Escalation detected...",
-  "event_count": 12,
-  "risk_level": "high",
-  "chain_of_thought": {
-    "steps": [
-      {
-        "step_number": 1,
-        "agent_type": "DataCollector",
-        "thought": "Retrieving events for Ukraine...",
-        "action": "SELECT * FROM events WHERE country = 'Ukraine'",
-        "observation": "Retrieved 12 events",
-        "confidence": 0.95
-      },
-      {
-        "step_number": 2,
-        "agent_type": "Analyst",
-        "thought": "Analyzing patterns...",
-        "action": "Calculate severity trends",
-        "observation": "Recent avg: 7.5, escalation detected",
-        "confidence": 0.88
-      }
-    ]
-  }
-}
-```
+## License
 
-## 🎨 Frontend Features
-
-### Interactive Map
-- Canvas-based heatmap visualization
-- Click to select countries
-- Real-time event tooltips
-- Severity-based coloring
-
-### Agent Visualization
-- Live agent status display
-- Chain-of-thought step visualization
-- Animated reasoning flow
-- Confidence indicators
-
-### User Experience
-- 3-step onboarding flow
-- Streak tracking with gamification
-- Upgrade prompts for free users
-- Responsive design
-
-## 💰 Monetization
-
-### Free Tier
-- 24-hour delayed data
-- 3 alerts maximum
-- Basic briefings
-- Community support
-
-### Pro ($9/month)
-- Real-time data
-- 50 alerts
-- AI-powered briefs with reasoning
-- 90-day history
-- Email support
-
-### Enterprise ($299/month)
-- Unlimited alerts
-- Full history
-- API access
-- Team workspaces
-- Priority support
-- Custom integrations
-
-## 📊 Performance
-
-| Metric | Target | Achieved |
-|--------|--------|----------|
-| API Response | <200ms | ~120ms |
-| Brief Generation | <3s | ~2.5s |
-| Bundle Size | <200KB | ~150KB |
-| Load Time | <2s | ~1.2s |
-
-## 🧪 Testing
-
-```bash
-# Backend tests
-cd backend
-cargo test
-
-# Frontend tests
-cd frontend
-npm test
-```
-
-## 🚢 Deployment
-
-### Cloudflare Workers (Recommended)
-
-```bash
-# Install Wrangler
-npm install -g wrangler
-
-# Login
-wrangler login
-
-# Create D1 database
-wrangler d1 create worldmonitor-agents
-
-# Set secrets
-wrangler secret put GROQ_API_KEY
-
-# Deploy
-wrangler deploy
-```
-
-### Railway
-
-```bash
-# Install Railway CLI
-npm install -g @railway/cli
-
-# Login and deploy
-railway login
-railway init
-railway up
-```
-
-### VPS/Dedicated Server
-
-```bash
-# Build Docker image
-docker build -t worldmonitor-agents .
-
-# Run
-docker run -d \
-  -p 8080:8080 \
-  -e GROQ_API_KEY=your_key \
-  -v /path/to/data:/app/data \
-  worldmonitor-agents
-```
-
-## 🔧 Configuration
-
-### Environment Variables
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `PORT` | No | 8080 | Server port |
-| `DATABASE_URL` | No | sqlite:./worldmonitor.db | Database connection |
-| `GROQ_API_KEY` | Yes | - | AI API key |
-| `STRIPE_SECRET_KEY` | No | - | Payment processing |
-| `JWT_SECRET` | No | change-me | Auth secret |
-| `MAX_ALERTS_FREE` | No | 3 | Free tier limit |
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## 📄 License
-
-MIT License - see LICENSE file
-
----
-
-**WorldMonitor Agents** - Built with Rust ⚡ React ⚡ AI
-
-*Transparent intelligence. Chain-of-thought reasoning. User-first design.*
+MIT © WorldMonitor Engineering
